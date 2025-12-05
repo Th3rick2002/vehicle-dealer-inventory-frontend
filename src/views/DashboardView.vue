@@ -1,3 +1,177 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import VehicleTable from '../components/VehicleTable.vue'
+import BrandsView from '../components/BrandsView.vue'
+import UsersView from '../components/UsersView.vue'
+import SettingsView from '../components/SettingsView.vue'
+
+const router = useRouter()
+
+const sidebarOpen = ref(true)
+const activeView = ref('dashboard')
+
+const menuItems = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'vehicles', label: 'Vehículos' },
+  { id: 'brands', label: 'Marcas' },
+  { id: 'users', label: 'Usuarios' },
+  { id: 'settings', label: 'Configuración' }
+]
+
+const stats = [
+  { label: 'Total Vehículos', value: '156', change: '+12%', color: 'bg-blue-500' },
+  { label: 'Disponibles', value: '89', change: '+8%', color: 'bg-green-500' },
+  { label: 'En Tránsito', value: '34', change: '+5%', color: 'bg-yellow-500' },
+  { label: 'Vendidos', value: '33', change: '+15%', color: 'bg-purple-500' }
+]
+
+const vehicles = ref([
+  {
+    id: 1,
+    vin: 'WBADT43452G123456',
+    brand: 'Toyota',
+    model: 'Camry',
+    year: 2024,
+    color: 'Blanco',
+    price: 28500,
+    status: 'Disponible',
+    engineType: 'Gasolina',
+    gearbox: 'Automática'
+  },
+  {
+    id: 2,
+    vin: 'KMHDN46D88U123789',
+    brand: 'Honda',
+    model: 'Civic',
+    year: 2024,
+    color: 'Negro',
+    price: 24900,
+    status: 'En_Transito',
+    engineType: 'Híbrido',
+    gearbox: 'Automática'
+  },
+  {
+    id: 3,
+    vin: '1HGBH41JXMN109456',
+    brand: 'Ford',
+    model: 'Mustang',
+    year: 2023,
+    color: 'Rojo',
+    price: 45000,
+    status: 'Reservado',
+    engineType: 'Gasolina',
+    gearbox: 'Manual'
+  },
+  {
+    id: 4,
+    vin: '5YJSA1E26HF123456',
+    brand: 'Tesla',
+    model: 'Model S',
+    year: 2024,
+    color: 'Azul',
+    price: 85000,
+    status: 'Disponible',
+    engineType: 'Eléctrico',
+    gearbox: 'Automática'
+  },
+  {
+    id: 5,
+    vin: '3VW2B7AJ8DM123456',
+    brand: 'Volkswagen',
+    model: 'Jetta',
+    year: 2023,
+    color: 'Gris',
+    price: 22500,
+    status: 'Vendido',
+    engineType: 'Gasolina',
+    gearbox: 'Manual'
+  },
+  {
+    id: 6,
+    vin: '2HGFC2F59JH123456',
+    brand: 'Honda',
+    model: 'Accord',
+    year: 2024,
+    color: 'Plata',
+    price: 32000,
+    status: 'En_Preparacion',
+    engineType: 'Híbrido',
+    gearbox: 'Automática'
+  },
+  {
+    id: 7,
+    vin: '1FTFW1ET5DFC12345',
+    brand: 'Ford',
+    model: 'F-150',
+    year: 2023,
+    color: 'Negro',
+    price: 52000,
+    status: 'Disponible',
+    engineType: 'Gasolina',
+    gearbox: 'Automática'
+  },
+  {
+    id: 8,
+    vin: 'JTDKARFP0J3123456',
+    brand: 'Toyota',
+    model: 'Prius',
+    year: 2024,
+    color: 'Verde',
+    price: 29500,
+    status: 'Entregado',
+    engineType: 'Híbrido',
+    gearbox: 'Automática'
+  }
+])
+
+const statusColors: Record<string, string> = {
+  'Disponible': 'bg-green-100 text-green-800',
+  'En_Transito': 'bg-blue-100 text-blue-800',
+  'En_Preparacion': 'bg-yellow-100 text-yellow-800',
+  'Reservado': 'bg-orange-100 text-orange-800',
+  'Vendido': 'bg-purple-100 text-purple-800',
+  'Entregado': 'bg-gray-100 text-gray-800'
+}
+
+const viewTitle = computed(() => {
+  const titles: Record<string, string> = {
+    dashboard: 'Dashboard',
+    vehicles: 'Gestión de Vehículos',
+    brands: 'Gestión de Marcas',
+    users: 'Gestión de Usuarios',
+    settings: 'Configuración'
+  }
+  return titles[activeView.value] || 'Dashboard'
+})
+
+const handleAddVehicle = () => {
+  console.log('Navegando a /add-vehicle')
+  router.push('/add-vehicle')
+}
+
+const handleViewVehicle = (vehicle: any) => {
+  console.log('Ver vehículo:', vehicle)
+  alert(`Ver detalles de: ${vehicle.brand} ${vehicle.model}\nVIN: ${vehicle.vin}`)
+}
+
+const handleEditVehicle = (vehicle: any) => {
+  console.log('Editar vehículo:', vehicle)
+  alert(`Editar: ${vehicle.brand} ${vehicle.model}`)
+}
+
+const handleDeleteVehicle = (vehicle: any) => {
+  console.log('Eliminar vehículo:', vehicle)
+  if (confirm(`¿Estás seguro de eliminar ${vehicle.brand} ${vehicle.model}?`)) {
+    const index = vehicles.value.findIndex(v => v.id === vehicle.id)
+    if (index !== -1) {
+      vehicles.value.splice(index, 1)
+      alert('Vehículo eliminado correctamente')
+    }
+  }
+}
+</script>
+
 <template>
   <div class="flex h-screen bg-gray-50">
     <!-- Sidebar -->
@@ -56,7 +230,6 @@
               : 'text-indigo-100 hover:bg-indigo-600'
           ]"
         >
-          <component :is="item.icon" class="w-5 h-5" />
           <span v-if="sidebarOpen" class="font-medium">{{ item.label }}</span>
         </button>
       </nav>
@@ -89,7 +262,6 @@
             </h2>
             <p class="text-gray-500 text-sm mt-1">Bienvenido al sistema de inventario</p>
           </div>
-
           <div class="flex items-center gap-4">
             <div class="relative">
               <svg
@@ -223,14 +395,14 @@
                     ${{ vehicle.price.toLocaleString() }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                      <span
-                        :class="[
-                          'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
-                          statusColors[vehicle.status]
-                        ]"
-                      >
-                        {{ vehicle.status.replace('_', ' ') }}
-                      </span>
+                    <span
+                      :class="[
+                        'px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full',
+                        statusColors[vehicle.status]
+                      ]"
+                    >
+                      {{ vehicle.status.replace('_', ' ') }}
+                    </span>
                   </td>
                 </tr>
                 </tbody>
@@ -239,7 +411,7 @@
           </div>
         </div>
 
-        <!-- Vehicles View - COMPONENTE NUEVO -->
+        <!-- Vehicles View -->
         <VehicleTable
           v-if="activeView === 'vehicles'"
           :vehicles="vehicles"
@@ -253,203 +425,15 @@
           @delete-vehicle="handleDeleteVehicle"
         />
 
-        <!-- Other Views -->
-        <div
-          v-if="['brands', 'users', 'settings'].includes(activeView)"
-          class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center"
-        >
-          <div
-            class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-              />
-            </svg>
-          </div>
-          <h3 class="text-xl font-bold text-gray-900 mb-2">Sección en Desarrollo</h3>
-          <p class="text-gray-500">Esta sección estará disponible próximamente</p>
-        </div>
+        <!-- Brands View -->
+        <BrandsView v-if="activeView === 'brands'" />
+
+        <!-- Users View -->
+        <UsersView v-if="activeView === 'users'" />
+
+        <!-- Settings View -->
+        <SettingsView v-if="activeView === 'settings'" />
       </main>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import VehicleTable from '../components/VehicleTable.vue'
-
-const MenuIcon = 'MenuIcon'
-const DashboardIcon = 'DashboardIcon'
-const CarIcon = 'CarIcon'
-const TagIcon = 'TagIcon'
-const UsersIcon = 'UsersIcon'
-const SettingsIcon = 'SettingsIcon'
-
-const sidebarOpen = ref(true)
-const activeView = ref('dashboard')
-
-const menuItems = [
-  { id: 'dashboard', icon: DashboardIcon, label: 'Dashboard' },
-  { id: 'vehicles', icon: CarIcon, label: 'Vehículos' },
-  { id: 'brands', icon: TagIcon, label: 'Marcas' },
-  { id: 'users', icon: UsersIcon, label: 'Usuarios' },
-  { id: 'settings', icon: SettingsIcon, label: 'Configuración' }
-]
-
-const stats = [
-  { label: 'Total Vehículos', value: '156', change: '+12%', color: 'bg-blue-500' },
-  { label: 'Disponibles', value: '89', change: '+8%', color: 'bg-green-500' },
-  { label: 'En Tránsito', value: '34', change: '+5%', color: 'bg-yellow-500' },
-  { label: 'Vendidos', value: '33', change: '+15%', color: 'bg-purple-500' }
-]
-
-const vehicles = ref([
-  {
-    id: 1,
-    vin: 'WBADT43452G123456',
-    brand: 'Toyota',
-    model: 'Camry',
-    year: 2024,
-    color: 'Blanco',
-    price: 28500,
-    status: 'Disponible',
-    engineType: 'Gasolina',
-    gearbox: 'Automática'
-  },
-  {
-    id: 2,
-    vin: 'KMHDN46D88U123789',
-    brand: 'Honda',
-    model: 'Civic',
-    year: 2024,
-    color: 'Negro',
-    price: 24900,
-    status: 'En_Transito',
-    engineType: 'Híbrido',
-    gearbox: 'Automática'
-  },
-  {
-    id: 3,
-    vin: '1HGBH41JXMN109456',
-    brand: 'Ford',
-    model: 'Mustang',
-    year: 2023,
-    color: 'Rojo',
-    price: 45000,
-    status: 'Reservado',
-    engineType: 'Gasolina',
-    gearbox: 'Manual'
-  },
-  {
-    id: 4,
-    vin: '5YJSA1E26HF123456',
-    brand: 'Tesla',
-    model: 'Model S',
-    year: 2024,
-    color: 'Azul',
-    price: 85000,
-    status: 'Disponible',
-    engineType: 'Eléctrico',
-    gearbox: 'Automática'
-  },
-  {
-    id: 5,
-    vin: '3VW2B7AJ8DM123456',
-    brand: 'Volkswagen',
-    model: 'Jetta',
-    year: 2023,
-    color: 'Gris',
-    price: 22500,
-    status: 'Vendido',
-    engineType: 'Gasolina',
-    gearbox: 'Manual'
-  },
-  {
-    id: 6,
-    vin: '2HGFC2F59JH123456',
-    brand: 'Honda',
-    model: 'Accord',
-    year: 2024,
-    color: 'Plata',
-    price: 32000,
-    status: 'En_Preparacion',
-    engineType: 'Híbrido',
-    gearbox: 'Automática'
-  },
-  {
-    id: 7,
-    vin: '1FTFW1ET5DFC12345',
-    brand: 'Ford',
-    model: 'F-150',
-    year: 2023,
-    color: 'Negro',
-    price: 52000,
-    status: 'Disponible',
-    engineType: 'Gasolina',
-    gearbox: 'Automática'
-  },
-  {
-    id: 8,
-    vin: 'JTDKARFP0J3123456',
-    brand: 'Toyota',
-    model: 'Prius',
-    year: 2024,
-    color: 'Verde',
-    price: 29500,
-    status: 'Entregado',
-    engineType: 'Híbrido',
-    gearbox: 'Automática'
-  }
-])
-
-const statusColors: Record<string, string> = {
-  'Disponible': 'bg-green-100 text-green-800',
-  'En_Transito': 'bg-blue-100 text-blue-800',
-  'En_Preparacion': 'bg-yellow-100 text-yellow-800',
-  'Reservado': 'bg-orange-100 text-orange-800',
-  'Vendido': 'bg-purple-100 text-purple-800',
-  'Entregado': 'bg-gray-100 text-gray-800'
-}
-
-const viewTitle = computed(() => {
-  const titles: Record<string, string> = {
-    dashboard: 'Dashboard',
-    vehicles: 'Gestión de Vehículos',
-    brands: 'Gestión de Marcas',
-    users: 'Gestión de Usuarios',
-    settings: 'Configuración'
-  }
-  return titles[activeView.value] || 'Dashboard'
-})
-
-// Funciones para manejar eventos de la tabla
-const handleAddVehicle = () => {
-  console.log('Agregar vehículo')
-  alert('Funcionalidad: Agregar nuevo vehículo')
-}
-
-const handleViewVehicle = (vehicle: any) => {
-  console.log('Ver vehículo:', vehicle)
-  alert(`Ver detalles de: ${vehicle.brand} ${vehicle.model}\nVIN: ${vehicle.vin}`)
-}
-
-const handleEditVehicle = (vehicle: any) => {
-  console.log('Editar vehículo:', vehicle)
-  alert(`Editar: ${vehicle.brand} ${vehicle.model}`)
-}
-
-const handleDeleteVehicle = (vehicle: any) => {
-  console.log('Eliminar vehículo:', vehicle)
-  if (confirm(`¿Estás seguro de eliminar ${vehicle.brand} ${vehicle.model}?`)) {
-    const index = vehicles.value.findIndex(v => v.id === vehicle.id)
-    if (index !== -1) {
-      vehicles.value.splice(index, 1)
-      alert('Vehículo eliminado correctamente')
-    }
-  }
-}
-</script>
