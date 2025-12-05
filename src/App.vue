@@ -1,9 +1,10 @@
-<script setup lang="ts">
+<template>
+  <router-view />
+</template>
 
+<script setup lang="ts">
 </script>
 
-<template>
-  <div>
-
-  </div>
-</template>
+<style>
+/* Estilos globales opcionales */
+</style>
