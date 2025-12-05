@@ -1,3 +1,112 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const tabs = [
+  { id: 'profile', label: 'Perfil' },
+  { id: 'security', label: 'Seguridad' },
+  { id: 'notifications', label: 'Notificaciones' },
+  { id: 'system', label: 'Sistema' },
+  { id: 'about', label: 'Acerca de' }
+]
+
+const activeTab = ref('profile')
+
+const profileData = ref({
+  name: 'Carlos Martínez',
+  email: 'carlos@autoinventory.com',
+  phone: '+503 7890-1234',
+  department: 'Administración'
+})
+
+const passwordData = ref({
+  current: '',
+  new: '',
+  confirm: ''
+})
+
+const twoFactorEnabled = ref(false)
+
+const notifications = ref([
+  {
+    id: 1,
+    title: 'Nuevos vehículos',
+    description: 'Recibir notificaciones cuando se agreguen nuevos vehículos',
+    enabled: true
+  },
+  {
+    id: 2,
+    title: 'Cambios de estado',
+    description: 'Notificar cuando un vehículo cambie de estado',
+    enabled: true
+  },
+  {
+    id: 3,
+    title: 'Ventas completadas',
+    description: 'Alertas cuando se concrete una venta',
+    enabled: true
+  },
+  {
+    id: 4,
+    title: 'Inventario bajo',
+    description: 'Avisar cuando el inventario esté por debajo del mínimo',
+    enabled: false
+  },
+  {
+    id: 5,
+    title: 'Reportes semanales',
+    description: 'Recibir resumen semanal por email',
+    enabled: true
+  }
+])
+
+const systemSettings = ref({
+  companyName: 'AutoInventory SA',
+  currency: 'USD',
+  timezone: 'America/Mexico_City',
+  language: 'es'
+})
+
+const saveProfile = () => {
+  alert('Perfil actualizado correctamente')
+}
+
+const changePassword = () => {
+  if (passwordData.value.new !== passwordData.value.confirm) {
+    alert('Las contraseñas no coinciden')
+    return
+  }
+  if (passwordData.value.new.length < 8) {
+    alert('La contraseña debe tener al menos 8 caracteres')
+    return
+  }
+  alert('Contraseña actualizada correctamente')
+  passwordData.value = { current: '', new: '', confirm: '' }
+}
+
+const toggleTwoFactor = () => {
+  twoFactorEnabled.value = !twoFactorEnabled.value
+  alert(`Autenticación de dos factores ${twoFactorEnabled.value ? 'activada' : 'desactivada'}`)
+}
+
+const saveNotifications = () => {
+  alert('Preferencias de notificaciones guardadas')
+}
+
+const saveSystemSettings = () => {
+  alert('Configuración del sistema actualizada')
+}
+
+const backupDatabase = () => {
+  alert('Iniciando respaldo de base de datos...\nEsto puede tomar unos minutos.')
+}
+
+const restoreDatabase = () => {
+  if (confirm('¿Estás seguro de restaurar la base de datos? Esto sobrescribirá todos los datos actuales.')) {
+    alert('Selecciona el archivo de respaldo para restaurar')
+  }
+}
+</script>
+
 <template>
   <div class="space-y-6">
     <!-- Tabs de configuración -->
@@ -340,111 +449,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
 
-const tabs = [
-  { id: 'profile', label: 'Perfil' },
-  { id: 'security', label: 'Seguridad' },
-  { id: 'notifications', label: 'Notificaciones' },
-  { id: 'system', label: 'Sistema' },
-  { id: 'about', label: 'Acerca de' }
-]
-
-const activeTab = ref('profile')
-
-const profileData = ref({
-  name: 'Carlos Martínez',
-  email: 'carlos@autoinventory.com',
-  phone: '+503 7890-1234',
-  department: 'Administración'
-})
-
-const passwordData = ref({
-  current: '',
-  new: '',
-  confirm: ''
-})
-
-const twoFactorEnabled = ref(false)
-
-const notifications = ref([
-  {
-    id: 1,
-    title: 'Nuevos vehículos',
-    description: 'Recibir notificaciones cuando se agreguen nuevos vehículos',
-    enabled: true
-  },
-  {
-    id: 2,
-    title: 'Cambios de estado',
-    description: 'Notificar cuando un vehículo cambie de estado',
-    enabled: true
-  },
-  {
-    id: 3,
-    title: 'Ventas completadas',
-    description: 'Alertas cuando se concrete una venta',
-    enabled: true
-  },
-  {
-    id: 4,
-    title: 'Inventario bajo',
-    description: 'Avisar cuando el inventario esté por debajo del mínimo',
-    enabled: false
-  },
-  {
-    id: 5,
-    title: 'Reportes semanales',
-    description: 'Recibir resumen semanal por email',
-    enabled: true
-  }
-])
-
-const systemSettings = ref({
-  companyName: 'AutoInventory SA',
-  currency: 'USD',
-  timezone: 'America/Mexico_City',
-  language: 'es'
-})
-
-const saveProfile = () => {
-  alert('Perfil actualizado correctamente')
-}
-
-const changePassword = () => {
-  if (passwordData.value.new !== passwordData.value.confirm) {
-    alert('Las contraseñas no coinciden')
-    return
-  }
-  if (passwordData.value.new.length < 8) {
-    alert('La contraseña debe tener al menos 8 caracteres')
-    return
-  }
-  alert('Contraseña actualizada correctamente')
-  passwordData.value = { current: '', new: '', confirm: '' }
-}
-
-const toggleTwoFactor = () => {
-  twoFactorEnabled.value = !twoFactorEnabled.value
-  alert(`Autenticación de dos factores ${twoFactorEnabled.value ? 'activada' : 'desactivada'}`)
-}
-
-const saveNotifications = () => {
-  alert('Preferencias de notificaciones guardadas')
-}
-
-const saveSystemSettings = () => {
-  alert('Configuración del sistema actualizada')
-}
-
-const backupDatabase = () => {
-  alert('Iniciando respaldo de base de datos...\nEsto puede tomar unos minutos.')
-}
-
-const restoreDatabase = () => {
-  if (confirm('¿Estás seguro de restaurar la base de datos? Esto sobrescribirá todos los datos actuales.')) {
-    alert('Selecciona el archivo de respaldo para restaurar')
-  }
-}
-</script>

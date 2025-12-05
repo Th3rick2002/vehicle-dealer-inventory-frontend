@@ -1,3 +1,173 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+interface User {
+  id: number
+  name: string
+  email: string
+  department: string
+  role: string
+  status: string
+  lastAccess: string
+}
+
+const users = ref<User[]>([
+  {
+    id: 1,
+    name: 'Carlos Martínez',
+    email: 'carlos@autoinventory.com',
+    department: 'Administración',
+    role: 'Admin',
+    status: 'Activo',
+    lastAccess: 'Hace 5 min'
+  },
+  {
+    id: 2,
+    name: 'Ana García',
+    email: 'ana@autoinventory.com',
+    department: 'Ventas',
+    role: 'Vendedor',
+    status: 'Activo',
+    lastAccess: 'Hace 1 hora'
+  },
+  {
+    id: 3,
+    name: 'Luis Rodríguez',
+    email: 'luis@autoinventory.com',
+    department: 'Ventas',
+    role: 'Vendedor',
+    status: 'Activo',
+    lastAccess: 'Hace 2 horas'
+  },
+  {
+    id: 4,
+    name: 'María López',
+    email: 'maria@autoinventory.com',
+    department: 'Logística',
+    role: 'Visualizador',
+    status: 'Activo',
+    lastAccess: 'Hace 3 horas'
+  },
+  {
+    id: 5,
+    name: 'Pedro Sánchez',
+    email: 'pedro@autoinventory.com',
+    department: 'Ventas',
+    role: 'Vendedor',
+    status: 'Inactivo',
+    lastAccess: 'Hace 2 días'
+  }
+])
+
+const searchQuery = ref('')
+const filterRole = ref('')
+const filterStatus = ref('')
+const showModal = ref(false)
+const editingUser = ref<User | null>(null)
+
+const formData = ref({
+  name: '',
+  email: '',
+  department: '',
+  role: '',
+  password: '',
+  status: 'Activo'
+})
+
+const roleColors: Record<string, string> = {
+  'Admin': 'bg-purple-100 text-purple-800',
+  'Vendedor': 'bg-blue-100 text-blue-800',
+  'Visualizador': 'bg-gray-100 text-gray-800'
+}
+
+const adminCount = computed(() => users.value.filter(u => u.role === 'Admin').length)
+const vendorCount = computed(() => users.value.filter(u => u.role === 'Vendedor').length)
+const activeCount = computed(() => users.value.filter(u => u.status === 'Activo').length)
+
+const filteredUsers = computed(() => {
+  return users.value.filter(user => {
+    const matchesSearch = searchQuery.value === '' ||
+      user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchesRole = filterRole.value === '' || user.role === filterRole.value
+    const matchesStatus = filterStatus.value === '' || user.status === filterStatus.value
+    return matchesSearch && matchesRole && matchesStatus
+  })
+})
+
+const openAddUserModal = () => {
+  editingUser.value = null
+  formData.value = {
+    name: '',
+    email: '',
+    department: '',
+    role: '',
+    password: '',
+    status: 'Activo'
+  }
+  showModal.value = true
+}
+
+const editUser = (user: User) => {
+  editingUser.value = user
+  formData.value = {
+    name: user.name,
+    email: user.email,
+    department: user.department,
+    role: user.role,
+    password: '',
+    status: user.status
+  }
+  showModal.value = true
+}
+
+const saveUser = () => {
+  if (editingUser.value) {
+    const index = users.value.findIndex(u => u.id === editingUser.value!.id)
+    if (index !== -1) {
+      users.value[index] = {
+        ...users.value[index],
+        ...formData.value,
+        lastAccess: 'Hace 1 min'
+      }
+      alert('Usuario actualizado correctamente')
+    }
+  } else {
+    const newUser: User = {
+      id: Math.max(...users.value.map(u => u.id)) + 1,
+      ...formData.value,
+      lastAccess: 'Recién creado'
+    }
+    users.value.push(newUser)
+    alert('Usuario creado correctamente')
+  }
+  closeModal()
+}
+
+const toggleUserStatus = (user: User) => {
+  const index = users.value.findIndex(u => u.id === user.id)
+  if (index !== -1) {
+    users.value[index].status = users.value[index].status === 'Activo' ? 'Inactivo' : 'Activo'
+    alert(`Usuario ${users.value[index].status === 'Activo' ? 'activado' : 'desactivado'} correctamente`)
+  }
+}
+
+const deleteUser = (user: User) => {
+  if (confirm(`¿Estás seguro de eliminar a ${user.name}?`)) {
+    const index = users.value.findIndex(u => u.id === user.id)
+    if (index !== -1) {
+      users.value.splice(index, 1)
+      alert('Usuario eliminado correctamente')
+    }
+  }
+}
+
+const closeModal = () => {
+  showModal.value = false
+  editingUser.value = null
+}
+</script>
+
 <template>
   <div class="space-y-6">
     <!-- Header con estadísticas -->
@@ -290,172 +460,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
 
-interface User {
-  id: number
-  name: string
-  email: string
-  department: string
-  role: string
-  status: string
-  lastAccess: string
-}
-
-const users = ref<User[]>([
-  {
-    id: 1,
-    name: 'Carlos Martínez',
-    email: 'carlos@autoinventory.com',
-    department: 'Administración',
-    role: 'Admin',
-    status: 'Activo',
-    lastAccess: 'Hace 5 min'
-  },
-  {
-    id: 2,
-    name: 'Ana García',
-    email: 'ana@autoinventory.com',
-    department: 'Ventas',
-    role: 'Vendedor',
-    status: 'Activo',
-    lastAccess: 'Hace 1 hora'
-  },
-  {
-    id: 3,
-    name: 'Luis Rodríguez',
-    email: 'luis@autoinventory.com',
-    department: 'Ventas',
-    role: 'Vendedor',
-    status: 'Activo',
-    lastAccess: 'Hace 2 horas'
-  },
-  {
-    id: 4,
-    name: 'María López',
-    email: 'maria@autoinventory.com',
-    department: 'Logística',
-    role: 'Visualizador',
-    status: 'Activo',
-    lastAccess: 'Hace 3 horas'
-  },
-  {
-    id: 5,
-    name: 'Pedro Sánchez',
-    email: 'pedro@autoinventory.com',
-    department: 'Ventas',
-    role: 'Vendedor',
-    status: 'Inactivo',
-    lastAccess: 'Hace 2 días'
-  }
-])
-
-const searchQuery = ref('')
-const filterRole = ref('')
-const filterStatus = ref('')
-const showModal = ref(false)
-const editingUser = ref<User | null>(null)
-
-const formData = ref({
-  name: '',
-  email: '',
-  department: '',
-  role: '',
-  password: '',
-  status: 'Activo'
-})
-
-const roleColors: Record<string, string> = {
-  'Admin': 'bg-purple-100 text-purple-800',
-  'Vendedor': 'bg-blue-100 text-blue-800',
-  'Visualizador': 'bg-gray-100 text-gray-800'
-}
-
-const adminCount = computed(() => users.value.filter(u => u.role === 'Admin').length)
-const vendorCount = computed(() => users.value.filter(u => u.role === 'Vendedor').length)
-const activeCount = computed(() => users.value.filter(u => u.status === 'Activo').length)
-
-const filteredUsers = computed(() => {
-  return users.value.filter(user => {
-    const matchesSearch = searchQuery.value === '' ||
-      user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.value.toLowerCase())
-    const matchesRole = filterRole.value === '' || user.role === filterRole.value
-    const matchesStatus = filterStatus.value === '' || user.status === filterStatus.value
-    return matchesSearch && matchesRole && matchesStatus
-  })
-})
-
-const openAddUserModal = () => {
-  editingUser.value = null
-  formData.value = {
-    name: '',
-    email: '',
-    department: '',
-    role: '',
-    password: '',
-    status: 'Activo'
-  }
-  showModal.value = true
-}
-
-const editUser = (user: User) => {
-  editingUser.value = user
-  formData.value = {
-    name: user.name,
-    email: user.email,
-    department: user.department,
-    role: user.role,
-    password: '',
-    status: user.status
-  }
-  showModal.value = true
-}
-
-const saveUser = () => {
-  if (editingUser.value) {
-    const index = users.value.findIndex(u => u.id === editingUser.value!.id)
-    if (index !== -1) {
-      users.value[index] = {
-        ...users.value[index],
-        ...formData.value,
-        lastAccess: 'Hace 1 min'
-      }
-      alert('Usuario actualizado correctamente')
-    }
-  } else {
-    const newUser: User = {
-      id: Math.max(...users.value.map(u => u.id)) + 1,
-      ...formData.value,
-      lastAccess: 'Recién creado'
-    }
-    users.value.push(newUser)
-    alert('Usuario creado correctamente')
-  }
-  closeModal()
-}
-
-const toggleUserStatus = (user: User) => {
-  const index = users.value.findIndex(u => u.id === user.id)
-  if (index !== -1) {
-    users.value[index].status = users.value[index].status === 'Activo' ? 'Inactivo' : 'Activo'
-    alert(`Usuario ${users.value[index].status === 'Activo' ? 'activado' : 'desactivado'} correctamente`)
-  }
-}
-
-const deleteUser = (user: User) => {
-  if (confirm(`¿Estás seguro de eliminar a ${user.name}?`)) {
-    const index = users.value.findIndex(u => u.id === user.id)
-    if (index !== -1) {
-      users.value.splice(index, 1)
-      alert('Usuario eliminado correctamente')
-    }
-  }
-}
-
-const closeModal = () => {
-  showModal.value = false
-  editingUser.value = null
-}
-</script>

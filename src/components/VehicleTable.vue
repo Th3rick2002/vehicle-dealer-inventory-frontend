@@ -1,3 +1,123 @@
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+
+interface Vehicle {
+  id: number
+  vin: string
+  brand: string
+  model: string
+  year: number
+  color: string
+  price: number
+  status: string
+  engineType: string
+  gearbox: string
+}
+
+interface Column {
+  key: string
+  label: string
+}
+
+interface Props {
+  vehicles: Vehicle[]
+  title?: string
+  subtitle?: string
+  showFilters?: boolean
+  showAddButton?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: 'Listado de Vehículos',
+  subtitle: 'Administra tu inventario de vehículos',
+  showFilters: true,
+  showAddButton: true
+})
+
+defineEmits<{
+  'add-vehicle': []
+  'view-vehicle': [vehicle: Vehicle]
+  'edit-vehicle': [vehicle: Vehicle]
+  'delete-vehicle': [vehicle: Vehicle]
+}>()
+
+const searchQuery = ref('')
+const filterStatus = ref('')
+const filterBrand = ref('')
+
+const columns: Column[] = [
+  { key: 'vin', label: 'VIN' },
+  { key: 'brand', label: 'Marca/Modelo' },
+  { key: 'year', label: 'Año' },
+  { key: 'color', label: 'Color' },
+  { key: 'engineType', label: 'Motor' },
+  { key: 'gearbox', label: 'Transmisión' },
+  { key: 'price', label: 'Precio' },
+  { key: 'status', label: 'Estado' }
+]
+
+const statusColors: Record<string, string> = {
+  'Disponible': 'bg-green-100 text-green-800',
+  'En_Transito': 'bg-blue-100 text-blue-800',
+  'En_Preparacion': 'bg-yellow-100 text-yellow-800',
+  'Reservado': 'bg-orange-100 text-orange-800',
+  'Vendido': 'bg-purple-100 text-purple-800',
+  'Entregado': 'bg-gray-100 text-gray-800'
+}
+
+const colorHexMap: Record<string, string> = {
+  'Blanco': '#FFFFFF',
+  'Negro': '#000000',
+  'Rojo': '#EF4444',
+  'Azul': '#3B82F6',
+  'Gris': '#6B7280',
+  'Plata': '#D1D5DB',
+  'Verde': '#10B981',
+  'Amarillo': '#FBBF24'
+}
+
+const uniqueBrands = computed(() => {
+  return [...new Set(props.vehicles.map(v => v.brand))].sort()
+})
+
+const hasActiveFilters = computed(() => {
+  return searchQuery.value !== '' || filterStatus.value !== '' || filterBrand.value !== ''
+})
+
+const filteredVehicles = computed(() => {
+  return props.vehicles.filter(vehicle => {
+    const matchesSearch = searchQuery.value === '' ||
+      vehicle.vin.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      vehicle.brand.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      vehicle.model.toLowerCase().includes(searchQuery.value.toLowerCase())
+
+    const matchesStatus = filterStatus.value === '' || vehicle.status === filterStatus.value
+    const matchesBrand = filterBrand.value === '' || vehicle.brand === filterBrand.value
+
+    return matchesSearch && matchesStatus && matchesBrand
+  })
+})
+
+const totalInventoryValue = computed(() => {
+  const total = filteredVehicles.value.reduce((sum, vehicle) => sum + vehicle.price, 0)
+  return total.toLocaleString()
+})
+
+const formatStatus = (status: string) => {
+  return status.replace(/_/g, ' ')
+}
+
+const getColorHex = (colorName: string): string => {
+  return colorHexMap[colorName] || '#9CA3AF'
+}
+
+const clearFilters = () => {
+  searchQuery.value = ''
+  filterStatus.value = ''
+  filterBrand.value = ''
+}
+</script>
+
 <template>
   <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <!-- Header con título y botón agregar -->
@@ -232,122 +352,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
 
-interface Vehicle {
-  id: number
-  vin: string
-  brand: string
-  model: string
-  year: number
-  color: string
-  price: number
-  status: string
-  engineType: string
-  gearbox: string
-}
-
-interface Column {
-  key: string
-  label: string
-}
-
-interface Props {
-  vehicles: Vehicle[]
-  title?: string
-  subtitle?: string
-  showFilters?: boolean
-  showAddButton?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  title: 'Listado de Vehículos',
-  subtitle: 'Administra tu inventario de vehículos',
-  showFilters: true,
-  showAddButton: true
-})
-
-defineEmits<{
-  'add-vehicle': []
-  'view-vehicle': [vehicle: Vehicle]
-  'edit-vehicle': [vehicle: Vehicle]
-  'delete-vehicle': [vehicle: Vehicle]
-}>()
-
-const searchQuery = ref('')
-const filterStatus = ref('')
-const filterBrand = ref('')
-
-const columns: Column[] = [
-  { key: 'vin', label: 'VIN' },
-  { key: 'brand', label: 'Marca/Modelo' },
-  { key: 'year', label: 'Año' },
-  { key: 'color', label: 'Color' },
-  { key: 'engineType', label: 'Motor' },
-  { key: 'gearbox', label: 'Transmisión' },
-  { key: 'price', label: 'Precio' },
-  { key: 'status', label: 'Estado' }
-]
-
-const statusColors: Record<string, string> = {
-  'Disponible': 'bg-green-100 text-green-800',
-  'En_Transito': 'bg-blue-100 text-blue-800',
-  'En_Preparacion': 'bg-yellow-100 text-yellow-800',
-  'Reservado': 'bg-orange-100 text-orange-800',
-  'Vendido': 'bg-purple-100 text-purple-800',
-  'Entregado': 'bg-gray-100 text-gray-800'
-}
-
-const colorHexMap: Record<string, string> = {
-  'Blanco': '#FFFFFF',
-  'Negro': '#000000',
-  'Rojo': '#EF4444',
-  'Azul': '#3B82F6',
-  'Gris': '#6B7280',
-  'Plata': '#D1D5DB',
-  'Verde': '#10B981',
-  'Amarillo': '#FBBF24'
-}
-
-const uniqueBrands = computed(() => {
-  return [...new Set(props.vehicles.map(v => v.brand))].sort()
-})
-
-const hasActiveFilters = computed(() => {
-  return searchQuery.value !== '' || filterStatus.value !== '' || filterBrand.value !== ''
-})
-
-const filteredVehicles = computed(() => {
-  return props.vehicles.filter(vehicle => {
-    const matchesSearch = searchQuery.value === '' ||
-      vehicle.vin.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      vehicle.brand.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      vehicle.model.toLowerCase().includes(searchQuery.value.toLowerCase())
-
-    const matchesStatus = filterStatus.value === '' || vehicle.status === filterStatus.value
-    const matchesBrand = filterBrand.value === '' || vehicle.brand === filterBrand.value
-
-    return matchesSearch && matchesStatus && matchesBrand
-  })
-})
-
-const totalInventoryValue = computed(() => {
-  const total = filteredVehicles.value.reduce((sum, vehicle) => sum + vehicle.price, 0)
-  return total.toLocaleString()
-})
-
-const formatStatus = (status: string) => {
-  return status.replace(/_/g, ' ')
-}
-
-const getColorHex = (colorName: string): string => {
-  return colorHexMap[colorName] || '#9CA3AF'
-}
-
-const clearFilters = () => {
-  searchQuery.value = ''
-  filterStatus.value = ''
-  filterBrand.value = ''
-}
-</script>
