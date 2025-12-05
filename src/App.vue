@@ -1,9 +1,11 @@
-<script setup lang="ts">
+<template>
+  <DashboardView />
+</template>
 
+<script setup lang="ts">
+import DashboardView from './views/DashboardView.vue'
 </script>
 
-<template>
-  <div>
-
-  </div>
-</template>
+<style>
+/* Estilos globales opcionales */
+</style>
